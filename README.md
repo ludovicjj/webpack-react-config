@@ -119,7 +119,7 @@ Comprendre webpack.config.js :
 6. Enfin, nous ajoutons un plugin appelé `HtmlWebpackPlugin` qui garantit que le webpack sait quel modèle de fichier html suivre pour exécuter l'application.
 
 
-package.json :
+**package.json** :
 
 ```
 "scripts": {
@@ -135,4 +135,90 @@ Lancer un build avec les fichiers minifier
 
 `npm run build`
 
-## Optimisations (wip)
+##5. Optimisations
+
+Des plugins comme `MiniCssExtractPlugin` peuvent aider à séparer et à réduire les fichiers CSS et à les intégrer sous forme de lien dans le fichier HTML
+
+`npm install --save-dev mini-css-extract-plugin`
+
+**Modification de la config webpack** : 
+
+D'abord `require` dans votre webpack.config.js et remplacez le chargeur `style-loader` par `MiniCssExtractPlugin` et ajoutez-le également dans le plugin.
+
+```
+const MiniCssExtractPlugin = require('mini-css-extract-plugin'); <- require
+
+module.exports = {
+   ...,
+   module: {
+      rules: [
+         ...,
+         {
+            test: /\.css$/,
+            use: [MiniCssExtractPlugin.loader, 'css-loader'] <- update loader
+         }
+      ],
+   },
+   ...,
+   plugins: [
+        new HtmlWebpackPlugin({
+            template: "./public/index.html"
+        }),
+        new MiniCssExtractPlugin() <- add plugin
+   ],
+}
+```
+##6. React Fast Refresh
+
+Cette nouvelle fonctionnalité que j'ai expérimentée est React Fast Refresh. Il s'agit de la dernière itération du rechargement à chaud de React. Lors de la modification d'un composant React, React Fast Refresh ne mettra à jour et restituera efficacement que ce composant. Cela conduit à des temps de rechargement à chaud nettement plus rapides. De plus, React Fast Refresh conservera l'état des composants pendant les re-rendus afin que vous n'ayez pas besoin de recréer manuellement le même scénario. Ces re-rendus "rapides" et indolores créent une expérience de développeur supérieure, rendant la boucle de rétroaction entre le changement et le résultat beaucoup plus efficace.
+
+`npm install -D @pmmmwh/react-refresh-webpack-plugin`
+
+**Création du fichier de configuration de babel** :
+
+```
+module.exports = function babel(api) {
+   const BABEL_ENV = api.env();
+   const presets = [
+      "@babel/preset-env",
+      "@babel/preset-react"
+   ];
+   const plugins = [];
+   if (BABEL_ENV === 'development') {
+       plugins.push('react-refresh/babel');
+   }
+   return {
+       presets,
+       plugins,
+   };
+};
+```
+
+**Modification de la configuration webpack** :
+
+```
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+module.exports = {
+   ...,
+   module: {
+      rules: [
+         {
+            test: /\.jsx?$/,
+            exclude: /node_modules/,
+            use: 'babel-loader',
+         },
+         {
+            test: /\.css$/,
+            use: [MiniCssExtractPlugin.loader, 'css-loader']
+         }
+      ],
+   },
+   plugins: [
+      new HtmlWebpackPlugin({
+      template: "./public/index.html"
+      }),
+      new MiniCssExtractPlugin(),
+      new ReactRefreshWebpackPlugin(), <- add the react-refresh-webpack-plugin plugin to the Webpack configuration file.
+   ],
+}
+```
