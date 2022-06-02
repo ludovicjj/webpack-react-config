@@ -172,7 +172,7 @@ module.exports = {
 
 Cette nouvelle fonctionnalité que j'ai expérimentée est React Fast Refresh. Il s'agit de la dernière itération du rechargement à chaud de React. Lors de la modification d'un composant React, React Fast Refresh ne mettra à jour et restituera efficacement que ce composant. Cela conduit à des temps de rechargement à chaud nettement plus rapides. De plus, React Fast Refresh conservera l'état des composants pendant les re-rendus afin que vous n'ayez pas besoin de recréer manuellement le même scénario. Ces re-rendus "rapides" et indolores créent une expérience de développeur supérieure, rendant la boucle de rétroaction entre le changement et le résultat beaucoup plus efficace.
 
-`npm install -D @pmmmwh/react-refresh-webpack-plugin`
+`npm install -D @pmmmwh/react-refresh-webpack-plugin react-refresh`
 
 **Création du fichier de configuration de babel** :
 
